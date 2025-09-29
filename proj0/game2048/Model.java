@@ -177,6 +177,38 @@ public class Model extends Observable {
     }
 
     /**
+     * Returns true if there are two adjacent tiles with the same value.
+     */
+    public static boolean adjacentTilesExists(Board b, int col, int row) {
+        int size = b.size();
+        Tile tile = b.tile(col, row);
+        Tile top, bottom, left, right;
+
+        if (tile == null) {
+            return false;
+        }
+
+        if (row - 1 >= 0) {
+            top = b.tile(row - 1, col);
+            return top != null && top.value() == tile.value();
+        }
+        if (row + 1 < size) {
+            bottom = b.tile(row + 1, col);
+            return bottom != null && bottom.value() == tile.value();
+        }
+        if (col - 1 >= 0) {
+            left = b.tile(col - 1, row);
+            return left != null && left.value() == tile.value();
+        }
+        if (col + 1 < size) {
+            right = b.tile(col + 1, row);
+			return right != null && right.value() == tile.value();
+        }
+
+        return false;
+    }
+
+    /**
      * Returns true if there are any valid moves on the board.
      * There are two ways that there can be valid moves:
      * 1. There is at least one empty space on the board.
@@ -184,9 +216,23 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        boolean exists = emptySpaceExists(b);
+        if (exists) {
+            return true;
+        }
+
+        int size = b.size();
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < b.size(); j++) {
+                exists = adjacentTilesExists(b, i, j);
+                if (exists) {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
-
 
     @Override
      /** Returns the model as a string, used for debugging. */
