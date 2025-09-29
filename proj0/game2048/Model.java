@@ -211,6 +211,7 @@ public class Model extends Observable {
         // changed local variable to true.
         board.setViewingPerspective(side);
 
+        // complete proj0
         changed = tiltNorth();
 
         board.setViewingPerspective(Side.NORTH);
