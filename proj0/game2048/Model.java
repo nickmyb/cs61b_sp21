@@ -188,21 +188,29 @@ public class Model extends Observable {
             return false;
         }
 
-        if (row + 1 >= 0) {
-            top = b.tile(row + 1, col);
-            return top != null && top.value() == tile.value();
+        if (row + 1 < size) {
+            top = b.tile(col, row + 1);
+            if(top != null && top.value() == tile.value()) {
+                return true;
+            }
         }
-        if (row - 1 < size) {
-            bottom = b.tile(row - 1, col);
-            return bottom != null && bottom.value() == tile.value();
+        if (row - 1 >= 0) {
+            bottom = b.tile(col, row - 1);
+            if (bottom != null && bottom.value() == tile.value()) {
+                return true;
+            }
         }
         if (col - 1 >= 0) {
             left = b.tile(col - 1, row);
-            return left != null && left.value() == tile.value();
+            if (left != null && left.value() == tile.value()) {
+                return true;
+            }
         }
         if (col + 1 < size) {
             right = b.tile(col + 1, row);
-			return right != null && right.value() == tile.value();
+			if (right != null && right.value() == tile.value()) {
+                return true;
+            }
         }
 
         return false;
