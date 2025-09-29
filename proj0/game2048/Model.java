@@ -188,12 +188,12 @@ public class Model extends Observable {
             return false;
         }
 
-        if (row - 1 >= 0) {
-            top = b.tile(row - 1, col);
+        if (row + 1 >= 0) {
+            top = b.tile(row + 1, col);
             return top != null && top.value() == tile.value();
         }
-        if (row + 1 < size) {
-            bottom = b.tile(row + 1, col);
+        if (row - 1 < size) {
+            bottom = b.tile(row - 1, col);
             return bottom != null && bottom.value() == tile.value();
         }
         if (col - 1 >= 0) {
