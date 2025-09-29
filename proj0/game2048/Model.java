@@ -94,6 +94,103 @@ public class Model extends Observable {
         setChanged();
     }
 
+    /** 找到同列的最上方的空白行 */
+    public int findFarthestBlankRow(Tile[] tileList, int row) {
+        int farthest = row;
+        for (int i = row+1; i < board.size(); i++) {
+            if (tileList[i] == null) {
+                farthest = i;
+            } else {
+                break;
+            }
+        }
+        return farthest;
+    }
+
+    /** 找到同列的最近的同值行 */
+    public int findNearestSameValueRow(Tile[] tileList, int row) {
+        if (tileList[row] == null) {
+            return row;
+        }
+
+        for (int i = row+1; i < board.size(); i++) {
+            // 空格继续向上
+            if (tileList[i] == null) {
+                continue;
+            }
+
+            if (tileList[i].value() != tileList[row].value()) {
+                return row;
+            } else if (tileList[i].value() == tileList[row].value()) {
+                return i;
+            }
+        }
+
+        return row;
+    }
+
+    public boolean tiltNorth4Col(int col) {
+        boolean changed = false;
+        int size = board.size();
+
+        Tile[] tileList = new Tile[size];
+        for (int i = 0; i < size; i++) {
+            tileList[i] = board.tile(col, i);
+        }
+
+        boolean[] tileListMerged = new boolean[size];
+
+        for (int i = size-2; i >= 0; i--) {
+            Tile tile = tileList[i];
+            if (tile == null) {
+                continue;
+            }
+
+            int same = findNearestSameValueRow(tileList, i);
+            int blank = findFarthestBlankRow(tileList, i);
+
+            if (same > i) {
+                if (!tileListMerged[same]) {
+                    // 合并相同的
+                    board.move(col, same, tile);
+                    this.score += tile.value() * 2;
+                    tileListMerged[same] = true;
+
+                    tileList[i] = null;
+                    tileList[same] = board.tile(col, same);
+
+                    changed = true;
+
+                    // merged过的不上移
+                    continue;
+                }
+            }
+
+            // 没有相同数字或者存在相同数字但已经merged
+            if ((same == i || same > i && tileListMerged[same]) && blank > i) {
+                // 上方有空白块
+                board.move(col, blank, tile);
+
+                tileList[i] = null;
+                tileList[blank] = board.tile(col, blank);
+
+                changed = true;
+            }
+        }
+
+        return changed;
+    }
+
+    public boolean tiltNorth() {
+        boolean changed = false;
+
+        for (int i = 0; i < board.size(); i++) {
+            changed = tiltNorth4Col(i) || changed;
+        }
+
+        return changed;
+    }
+
     /** Tilt the board toward SIDE. Return true iff this changes the board.
      *
      * 1. If two Tile objects are adjacent in the direction of motion and have
@@ -108,11 +205,15 @@ public class Model extends Observable {
      * */
     public boolean tilt(Side side) {
         boolean changed;
-        changed = false;
 
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        board.setViewingPerspective(side);
+
+        changed = tiltNorth();
+
+        board.setViewingPerspective(Side.NORTH);
 
         checkGameOver();
         if (changed) {
