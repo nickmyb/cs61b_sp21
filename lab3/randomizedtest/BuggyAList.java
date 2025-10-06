@@ -7,6 +7,7 @@ package randomizedtest;
 //         0 1  2 3 4 5 6 7
 // items: [6 9 -1 2 0 0 0 0 ...]
 // size: 5
+// lab3
 
 /* Invariants:
  addLast: The next item we want to add, will go into position size
